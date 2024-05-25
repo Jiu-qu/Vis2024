@@ -28,8 +28,6 @@ const tooltip = d3.select("body").append("div").attr("id", "tooltip");
 # 2.1. Submission Frequency Analysis
 
 ```js
-const problems = await FileAttachment("data/problems.csv").csv({typed: true});
-
 const students = await FileAttachment("data/students.csv").csv({typed: true});
 ```
 
