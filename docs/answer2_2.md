@@ -41,10 +41,6 @@ const studentID = view(Inputs.select(search.map(d => d.student_ID), {label: "Sel
 ```
 
 ```js
-display(studentID);
-```
-
-```js
 const questionTypes = await FileAttachment("data/question_types.csv").csv({typed: true});
 ```
 
@@ -67,15 +63,7 @@ const studentQuestionTypesRow = questionTypes.filter(d => d.student_ID === stude
 ```
 
 ```js
-studentQuestionTypesRow
-```
-
-```js
 const studentQuestionTypes = formatKnowledges(studentQuestionTypesRow);
-```
-
-```js
-display(studentQuestionTypes)
 ```
 
 ```js
@@ -88,15 +76,23 @@ const buildRenderQuestionTypesDiagram = (config) => {
 
   const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  const yAxisGroup = chart.append("g").attr("transform", "translate(-2, 0)");
+
   // scale
   const xScale = d3.scaleBand().range([0, width]).paddingInner(0.05);
   const yScale = d3.scaleBand().range([height, 0]).paddingInner(0.05);
   const colorScale = d3.scaleSequential().interpolator(d3.interpolateReds);
 
+  const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
+
   return (data) => {
     xScale.domain(data.map(d => d.pos));
     yScale.domain(data.map(d => d.knowledge));
-    colorScale.domain([0, 1]);
+    colorScale.domain([0.7, 1]);
+
+    yAxisGroup.call(yAxis);
+    yAxisGroup.select('.domain').attr('stroke-width', 0);
+
 
     const handleOnMouseEnter = (e, d) => {
       // make other area opacity
@@ -108,7 +104,7 @@ const buildRenderQuestionTypesDiagram = (config) => {
     const handleOnMouseMove = (e, d) => {
       console.log(d);
 
-      d3.select("#tooltip").style("left", e.pageX + 10 + "px").style("top", e.pageY + 10 + "px").html(`<div class="tooltip-label">Knowledge</div>${d.name}<div class="tooltip-label">Frequency</div>${d.freq}`);
+      d3.select("#tooltip").style("left", e.pageX + 10 + "px").style("top", e.pageY + 10 + "px").html(`<div class="tooltip-label">Knowledge</div>${d.name}<div class="tooltip-label">Frequency</div>${d.freq.toFixed(2)}`);
     }
 
     const handleOnMouseLeave = (e, d) => {
@@ -121,6 +117,7 @@ const buildRenderQuestionTypesDiagram = (config) => {
     const cell = chart.selectAll(".h-cell").data(data).join("rect").attr("class", d => d.pos === 0 ? "h-cell" : "h-cell h-cell-sub").attr("height", yScale.bandwidth()).attr("width", xScale.bandwidth()).attr("x", d => xScale(d.pos)).attr("y", d => yScale(d.knowledge)).attr("fill", d => colorScale(d.freq));
     cell.on("mouseenter", handleOnMouseEnter).on("mousemove", handleOnMouseMove).on("mouseleave", handleOnMouseLeave);
 
+    const cellText = chart.selectAll(".h-text").data(data).join("text").attr("class", "h-text").attr("x", d => xScale(d.pos) + xScale.bandwidth() / 2).attr("y", d => yScale(d.knowledge) + yScale.bandwidth() / 2).attr("fill", d => d.freq > 0.8 ? "white" : "black").attr("text-anchor", "middle").text(d => d.pos === 0 ? d.name : d.name.split("_")[1])
 
     return svg.node();
   }
@@ -128,7 +125,7 @@ const buildRenderQuestionTypesDiagram = (config) => {
 ```
 
 ```js
-const renderQuestionTypesDiagram = buildRenderQuestionTypesDiagram({margin: {left: 55, right: 20, top: 20, bottom: 55}, width: 1000, height: 600});
+const renderQuestionTypesDiagram = buildRenderQuestionTypesDiagram({margin: {left: 60, right: 20, top: 20, bottom: 20}, width: 400, height: 600});
 ```
 
 ```js
