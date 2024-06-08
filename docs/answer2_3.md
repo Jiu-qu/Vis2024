@@ -80,7 +80,7 @@ const buildRenderPieChart = (config) => {
 
   // Create the color scale.
   const colorScale = d3.scaleOrdinal()
-      .range(["lightblue", "lightgreen"])
+      .range(["#8da0cb", "#8dd3c7"])
 
   // Create the pie layout and arc generator.
   const pie = d3.pie()
@@ -141,7 +141,7 @@ const buildRenderPieChart = (config) => {
 
     // Create a new arc generator to place a label close to the edge.
     // The label shows the value if there is enough room.
-    const pieText = svg.selectAll(".pie-text").data(arcs).join("text").attr("class", "pie-text").attr("text-anchor", "middle").text(d => d.data.value > 0 ? d.data.name : "");
+    const pieText = svg.selectAll(".pie-text").data(arcs).join("text").attr("class", "pie-text").attr("text-anchor", "middle").text(d => d.data.value > 0 ? d.data.name : "").attr("fill", "white");
     pieText.transition().duration(500).attr("transform", d => `translate(${arcLabel.centroid(d)})`);
     
     return svg.node();

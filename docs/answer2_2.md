@@ -81,14 +81,14 @@ const buildRenderQuestionTypesDiagram = (config) => {
   // scale
   const xScale = d3.scaleBand().range([0, width]).paddingInner(0.05);
   const yScale = d3.scaleBand().range([height, 0]).paddingInner(0.05);
-  const colorScale = d3.scaleSequential().interpolator(d3.interpolateReds);
+  const colorScale = d3.scaleSequential().interpolator(d3.interpolateBuGn);
 
   const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
 
   return (data) => {
     xScale.domain(data.map(d => d.pos));
     yScale.domain(data.map(d => d.knowledge));
-    colorScale.domain([0.7, 1]);
+    colorScale.domain([0.7, 1.2]);
 
     yAxisGroup.call(yAxis);
     yAxisGroup.select('.domain').attr('stroke-width', 0);

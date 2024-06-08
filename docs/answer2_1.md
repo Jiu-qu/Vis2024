@@ -106,16 +106,16 @@ const buildRenderSubmitTimesDiagram = (config) => {
       d3.select("#tooltip").style("display", "none");
     }
 
-    const barChart = chart.selectAll(".bar").data(data).join("rect").attr("class", "bar").attr("fill", "steelblue").attr("width", xScale.bandwidth()).attr("x", d => xScale(d.hour));
+    const barChart = chart.selectAll(".bar").data(data).join("rect").attr("class", "bar").attr("fill", "#8dd3c7").attr("width", xScale.bandwidth()).attr("x", d => xScale(d.hour));
     barChart.transition().duration(500).attr("height", d => height - yScale(d.submits)).attr("y", d =>  yScale(d.submits));
     barChart.on("mouseenter", handleOnMouseEnter).on("mousemove", handleOnMouseMove).on("mouseleave", handleOnMouseLeave)
 
     const middleValue = data.reduce((acc, d) => acc + d.hour * d.submits, 0) / data.reduce((acc, d) => acc + d.submits, 0);
 
-    const middleValueLine = chart.selectAll(".middle-val-line").data([middleValue]).join("line").attr("class", "middle-val-line").attr("y1", 0).attr("y2", height).style("stroke-width", 2).style("stroke", "red").style("fill", "none");
+    const middleValueLine = chart.selectAll(".middle-val-line").data([middleValue]).join("line").attr("class", "middle-val-line").attr("y1", 0).attr("y2", height).style("stroke-width", 2).style("stroke", "#8da0cb").style("fill", "none");
     middleValueLine.transition().duration(500).attr("x1", d => lineXScale(d)).attr("x2", d => lineXScale(d))
 
-    const middleValueText = chart.selectAll(".middle-val-text").data([middleValue]).join("text").attr("class", "middle-val-text").attr("text-anchor", "middle").attr("y", -20).attr("dy", "0.85em").text("Average Submit Time");
+    const middleValueText = chart.selectAll(".middle-val-text").data([middleValue]).join("text").attr("class", "middle-val-text").attr("text-anchor", "middle").attr("y", -20).attr("dy", "0.85em").text("Average Submit Time").attr("fill", "#8da0cb");
     middleValueText.transition().duration(500).attr("x", d => lineXScale(d));
 
     return svg.node();

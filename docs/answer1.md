@@ -117,17 +117,18 @@ const collisionCounts = studentAnswerDataRow.reduce((acc, d) => {
 //   .interpolator(d3.interpolateRainbow) // 选择一个彩色的插值方案
 //   .domain([1, d3.max(Object.values(collisionCounts))]) // 定义域为重合数量的最小和最大值
 
-const colors = [
-  "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
-  "#9467bd", "#8c564b", "#e377c2", "#7f7f7f"
-];
+const colors = d3.schemeTableau10;
 
 // 2. 创建 scaleOrdinal 颜色比例尺
 const knowledgeColorScale = d3.scaleOrdinal()
   .domain(["t5V9e", "m3D1v", "g7R2j", "y9W5d", "r8S3g", "b3C9s", "k4W1c", "s8Y2f"]) // 知识字段的八个值
   .range(colors); // 为每个知识值分配颜色
 
-const radiusScale = d3.scaleSqrt()
+const radiusScale = (c) => {
+  return 8 * Math.sqrt(c);
+}
+
+d3.scaleSqrt()
   .domain([1, d3.max(Object.values(collisionCounts))])
   .range([5, 20]); // 将重合数量映射到半径大小的范围，例如从 5px 到 20px
 
@@ -156,7 +157,7 @@ const buildRenderAnswerDataDiagram = (config) => {
         .range([marginLeft, width - marginRight]);
 
     const y = d3.scaleLinear()
-        .domain(d3.extent(studentAnswerDataRow, d => d.score_ratio)).nice()
+        .domain([0, 1]).nice()
         .range([height - marginBottom, marginTop]);
 
     // Create the axes.
@@ -225,15 +226,14 @@ const buildRenderAnswerDataDiagram = (config) => {
             .attr("x2", width - marginRight));
 
     const points = svg.append("g")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 1.5)
         .selectAll("circle")
         .data(studentAnswerDataRow)
         .join("circle")
         .attr("cx", d => x(d.Absolutely_Correct_ratio))
       .attr("cy", d => y(d.score_ratio))
       .attr("r", 0) // 开始时半径为0
-      .attr("fill", d => knowledgeColorScale(d.knowledge));
+      .attr("fill", d => knowledgeColorScale(d.knowledge))
+      .attr("opacity", 0.8)
 
     points.transition() // 开始过渡效果
       .duration(500) // 设置动画持续时间
@@ -284,7 +284,7 @@ const buildRenderAnswerDataDiagram = (config) => {
         })
         .on("mouseout", (event, d) => {
           tooltip.style("display", "none");
-          svg.selectAll("circle").attr("opacity", 1);
+          svg.selectAll("circle").attr("opacity", 0.8);
         })
         .on("mousemove", (event, d) => {
           // 更新Tooltip内容和位置
