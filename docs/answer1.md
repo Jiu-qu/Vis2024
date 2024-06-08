@@ -131,6 +131,11 @@ const radiusScale = d3.scaleSqrt()
   .domain([1, d3.max(Object.values(collisionCounts))])
   .range([5, 20]); // 将重合数量映射到半径大小的范围，例如从 5px 到 20px
 
+studentAnswerDataRow.sort((a, b) =>
+  collisionCounts[`${b.Absolutely_Correct_ratio}_${b.score_ratio}`] -
+  collisionCounts[`${a.Absolutely_Correct_ratio}_${a.score_ratio}`]
+);
+
 const buildRenderAnswerDataDiagram = (config) => {
   const width = config.width;
   const height = config.height;
@@ -143,7 +148,6 @@ const buildRenderAnswerDataDiagram = (config) => {
   const svg = d3.create("svg")
       .attr("viewBox", [0, 0, width, height])
       .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
-
 
   return (data) => {
     // Prepare the scales for positional encoding.
@@ -220,17 +224,36 @@ const buildRenderAnswerDataDiagram = (config) => {
             .attr("x1", marginLeft)
             .attr("x2", width - marginRight));
 
-    // Add a layer of dots.
-    svg.append("g")
+    const points = svg.append("g")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
         .selectAll("circle")
         .data(studentAnswerDataRow)
         .join("circle")
         .attr("cx", d => x(d.Absolutely_Correct_ratio))
-        .attr("cy", d => y(d.score_ratio))
-        .attr("r", d => radiusScale(collisionCounts[`${d.Absolutely_Correct_ratio}_${d.score_ratio}`]))
-        .attr("fill", d => knowledgeColorScale(d.knowledge))
+      .attr("cy", d => y(d.score_ratio))
+      .attr("r", 0) // 开始时半径为0
+      .attr("fill", d => knowledgeColorScale(d.knowledge));
+
+    points.transition() // 开始过渡效果
+      .duration(500) // 设置动画持续时间
+      .attr("cx", d => x(d.Absolutely_Correct_ratio))
+      .attr("cy", d => y(d.score_ratio))
+      .attr("r", d => radiusScale(collisionCounts[`${d.Absolutely_Correct_ratio}_${d.score_ratio}`]))
+      .attr("fill", d => knowledgeColorScale(d.knowledge));
+
+    // Add a layer of dots.
+    // svg.append("g")
+    //     .attr("stroke", "steelblue")
+    //     .attr("stroke-width", 1.5)
+    //     .selectAll("circle")
+    //     .data(studentAnswerDataRow)
+    //     .join("circle")
+    //     .attr("cx", d => x(d.Absolutely_Correct_ratio))
+    //     .attr("cy", d => y(d.score_ratio))
+    //     .attr("r", d => radiusScale(collisionCounts[`${d.Absolutely_Correct_ratio}_${d.score_ratio}`]))
+    //     .attr("fill", d => knowledgeColorScale(d.knowledge))
+    //     .style("z-index", d => -radiusScale(collisionCounts[`${d.Absolutely_Correct_ratio}_${d.score_ratio}`]))
         // .attr("fill", d => {
         //   const key = `${d.Absolutely_Correct_ratio}_${d.score_ratio}`;
         //   return colorScale(collisionCounts[key]);
