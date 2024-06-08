@@ -110,12 +110,26 @@ const collisionCounts = studentAnswerDataRow.reduce((acc, d) => {
   acc[key] = (acc[key] || 0) + 1;
   return acc;
 }, {});
-const colorScale = d3.scaleQuantize()
-    .domain([1, d3.max(Object.values(collisionCounts))]) // 设置颜色比例尺的域
-    .range(["#ffeda0", "#fdae61", "#f46d43", "#d73027"]); 
+// const colorScale = d3.scaleQuantize()
+//     .domain([1, d3.max(Object.values(collisionCounts))]) // 设置颜色比例尺的域
+//     .range(["#ffeda0", "#fdae61", "#f46d43", "#d73027"]); 
 // const colorScale = d3.scaleSequential()
 //   .interpolator(d3.interpolateRainbow) // 选择一个彩色的插值方案
 //   .domain([1, d3.max(Object.values(collisionCounts))]) // 定义域为重合数量的最小和最大值
+
+const colors = [
+  "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
+  "#9467bd", "#8c564b", "#e377c2", "#7f7f7f"
+];
+
+// 2. 创建 scaleOrdinal 颜色比例尺
+const knowledgeColorScale = d3.scaleOrdinal()
+  .domain(["t5V9e", "m3D1v", "g7R2j", "y9W5d", "r8S3g", "b3C9s", "k4W1c", "s8Y2f"]) // 知识字段的八个值
+  .range(colors); // 为每个知识值分配颜色
+
+const radiusScale = d3.scaleSqrt()
+  .domain([1, d3.max(Object.values(collisionCounts))])
+  .range([5, 20]); // 将重合数量映射到半径大小的范围，例如从 5px 到 20px
 
 const buildRenderAnswerDataDiagram = (config) => {
   const width = config.width;
@@ -215,11 +229,12 @@ const buildRenderAnswerDataDiagram = (config) => {
         .join("circle")
         .attr("cx", d => x(d.Absolutely_Correct_ratio))
         .attr("cy", d => y(d.score_ratio))
-        .attr("r", 3)
-        .attr("fill", d => {
-          const key = `${d.Absolutely_Correct_ratio}_${d.score_ratio}`;
-          return colorScale(collisionCounts[key]);
-        });
+        .attr("r", d => radiusScale(collisionCounts[`${d.Absolutely_Correct_ratio}_${d.score_ratio}`]))
+        .attr("fill", d => knowledgeColorScale(d.knowledge))
+        // .attr("fill", d => {
+        //   const key = `${d.Absolutely_Correct_ratio}_${d.score_ratio}`;
+        //   return colorScale(collisionCounts[key]);
+        // });
 
     collectCollisionData(studentAnswerDataRow, x, y);
 
